@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "exitmap"
+version = "0.1.0"
+description = ""
+authors = ["Arturo Filastò <arturo@filasto.net>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pysocks = "^1.7.1"
+stem = "^1.8.1"
+dnspython = "^2.3.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.1"
+pytest-cov = "^4.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
