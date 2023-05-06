@@ -135,30 +135,25 @@ def module_call(queue, module, circ_id, socks_port,
     The invoking process keeps track of which circuits finished.  Once we
     are done, we send a signal over the queue to let the process know.
     """
-    def run_python_over_tor_wrapper(queue, circ_id, socks_port):
-        """
-        Returns a closure to route a Python function's network traffic over Tor.
-        """
 
-        def closure(func, *args):
-            """
-            Route the given Python function's network traffic over Tor.
-            We temporarily monkey-patch socket.socket using our torsocks
-            module, and reset it once the function returns.
-            """
-            try:
-                with torsocks.MonkeyPatchedSocket(queue, circ_id, socks_port):
-                    func(*args)
-            except (error.SOCKSv5Error, socket.error) as err:
-                log.info(err)
-                return
-
-        return closure
+    def run_python_over_tor(func, *args):
+        """
+        Route the given Python function's network traffic over Tor.
+        We temporarily monkey-patch socket.socket using our torsocks
+        module, and reset it once the function returns.
+        """
+        try:
+            with torsocks.MonkeyPatchedSocket(queue, circ_id, socks_port):
+                func(*args)
+        except (error.SOCKSv5Error, socket.error) as err:
+            print(f"FAIL {circ_id} {socks_port}")
+            log.info(err)
+            return
 
     try:
         module(
             exit_desc=exit_desc,
-            run_python_over_tor=run_python_over_tor_wrapper(queue, circ_id, socks_port),
+            run_python_over_tor=run_python_over_tor,
             run_cmd_over_tor=run_cmd_over_tor,
             destinations=destinations
         )
