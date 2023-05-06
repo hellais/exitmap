@@ -52,6 +52,6 @@ def probe(exit_desc, run_python_over_tor, run_cmd_over_tor, target, **kwargs):
             raise
 
     with open(os.path.join("ooniscan",
-                           exit_desc.fingerprint + ".csv"), "wt") as f:
+                           exit_desc.fingerprint + ".csv"), "a+") as f:
         wr = csv.writer(f, quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
         run_python_over_tor(fetch_page, exit_desc, target, wr)
