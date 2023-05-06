@@ -364,32 +364,43 @@ def run_module(module_name, args, controller, socks_port, stats):
         log.debug("Calling module's setup() function.")
         module.setup()
 
-    exit_destinations = select_exits(args, module)
+    destinations_target_list = [(None, None)]
+    if hasattr(module, "targets"):
+        destinations_target_list = module.targets
 
-    exit_relays = list(exit_destinations.keys())
-    random.shuffle(exit_relays)
+    idx = 0
+    for destinations, target in destinations_target_list:
+        if destinations is not None:
+            log.info(f"Scanning {target}")
+            module.destinations = destinations
 
-    log.debug("Running actually the module.")
-    count = len(exit_relays)
-    stats.total_circuits += count
+        exit_destinations = select_exits(args, module)
 
-    if count < 1:
-        raise error.ExitSelectionError("Exit selection yielded %d exits "
-                                       "but need at least one." % count)
+        exit_relays = list(exit_destinations.keys())
+        random.shuffle(exit_relays)
 
-    handler = EventHandler(controller, module, socks_port, stats,
-                           exit_destinations=exit_destinations)
+        log.debug("Running actually the module.")
+        count = len(exit_relays)
+        stats.total_circuits += count
 
-    controller.add_event_listener(handler.new_event,
-                                  EventType.CIRC, EventType.STREAM)
+        if count < 1:
+            raise error.ExitSelectionError("Exit selection yielded %d exits "
+                                           "but need at least one." % count)
 
-    duration = count * args.build_delay
-    log.info("Scan is estimated to take around %s." %
-             datetime.timedelta(seconds=duration))
+        handler = EventHandler(controller, module, socks_port, stats,
+                               exit_destinations=exit_destinations, target=target)
 
-    log.info("Beginning to trigger %d circuit creation(s)." % count)
+        controller.add_event_listener(handler.new_event,
+                                      EventType.CIRC, EventType.STREAM)
 
-    iter_exit_relays(exit_relays, controller, stats, args)
+        duration = count * args.build_delay * (len(destinations_target_list) - idx)
+        log.info("Scan is estimated to take around %s." %
+                 datetime.timedelta(seconds=duration))
+
+        log.info("Beginning to trigger %d circuit creation(s)." % count)
+
+        iter_exit_relays(exit_relays, controller, stats, args)
+        idx += 1
 
 
 def sleep(delay, delay_noise):
