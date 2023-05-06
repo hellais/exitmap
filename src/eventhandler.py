@@ -122,7 +122,7 @@ class Attacher(object):
         try:
             self.controller.attach_stream(stream_id, circuit_id)
         except stem.OperationFailed as err:
-            log.warning("Failed to attach stream because: %s" % err)
+            log.warning(f"Failed to attach stream {stream_id} {circuit_id} because: {err}")
 
 
 def module_call(queue, module, circ_id, socks_port,
