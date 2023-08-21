@@ -26,6 +26,10 @@ target_urls = [
     "https://twitter.com/robots.txt"
 ]
 
+target_urls = [
+    "https://ooni.org/robots.txt"
+]
+
 # Targets are formatted as destinations_list, target
 targets = [
     ([(urlparse(t).netloc, 443)], t) for t in target_urls
