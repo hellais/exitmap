@@ -55,12 +55,15 @@ def bootstrap_tor(args):
     Invoke a Tor process which is subsequently used by exitmap.
     """
 
-    log.info("Attempting to invoke Tor process in directory \"%s\".  This "
-             "might take a while." % args.tor_dir)
+    log.info(
+        'Attempting to invoke Tor process in directory "%s".  This '
+        "might take a while." % args.tor_dir
+    )
 
     if not args.first_hop:
-        log.info("No first hop given.  Using randomly determined first "
-                 "hops for circuits.")
+        log.info(
+            "No first hop given.  Using randomly determined first " "hops for circuits."
+        )
 
     ports = {}
     partial_parse_log_lines = functools.partial(util.parse_log_lines, ports)
@@ -103,8 +106,13 @@ def parse_cmd_args():
     desc = "Perform a task over (a subset of) all Tor exit relays."
     parser = argparse.ArgumentParser(description=desc, add_help=False)
 
-    parser.add_argument("-f", "--config-file", type=str, default=None,
-                        help="Path to the configuration file.")
+    parser.add_argument(
+        "-f",
+        "--config-file",
+        type=str,
+        default=None,
+        help="Path to the configuration file.",
+    )
 
     args, remaining_argv = parser.parse_known_args()
 
@@ -123,8 +131,7 @@ def parse_cmd_args():
         try:
             defaults = dict(config_parser.items("Defaults"))
         except ConfigParser.NoSectionError as err:
-            log.warning("Could not parse config file \"%s\": %s" %
-                        (config_file, err))
+            log.warning('Could not parse config file "%s": %s' % (config_file, err))
             defaults = {}
     else:
         defaults = {}
@@ -136,77 +143,133 @@ def parse_cmd_args():
 
     group = parser.add_mutually_exclusive_group()
 
-    group.add_argument("-C", "--country", type=str, default=None,
-                       help="Only probe exit relays of the country which is "
-                            "determined by the given 2-letter country code.")
+    group.add_argument(
+        "-C",
+        "--country",
+        type=str,
+        default=None,
+        help="Only probe exit relays of the country which is "
+        "determined by the given 2-letter country code.",
+    )
 
-    group.add_argument("-e", "--exit", type=str, default=None,
-                       help="Only probe the exit relay which has the given "
-                            "20-byte fingerprint.")
+    group.add_argument(
+        "-e",
+        "--exit",
+        type=str,
+        default=None,
+        help="Only probe the exit relay which has the given " "20-byte fingerprint.",
+    )
 
-    group.add_argument("-E", "--exit-file", type=str, default=None,
-                       help="File containing the 20-byte fingerprints "
-                            "of exit relays to probe, one per line.")
+    group.add_argument(
+        "-E",
+        "--exit-file",
+        type=str,
+        default=None,
+        help="File containing the 20-byte fingerprints "
+        "of exit relays to probe, one per line.",
+    )
 
-    parser.add_argument("-d", "--build-delay", type=float, default=3,
-                        help="Wait for the given delay (in seconds) between "
-                             "circuit builds.  The default is 3.")
+    parser.add_argument(
+        "-d",
+        "--build-delay",
+        type=float,
+        default=3,
+        help="Wait for the given delay (in seconds) between "
+        "circuit builds.  The default is 3.",
+    )
 
-    parser.add_argument("-n", "--delay-noise", type=float, default=0,
-                        help="Sample random value in [0, DELAY_NOISE) and "
-                             "randomly add it to or subtract it from the build"
-                             " delay.  This randomises the build delay.  The "
-                             "default is 0.")
+    parser.add_argument(
+        "-n",
+        "--delay-noise",
+        type=float,
+        default=0,
+        help="Sample random value in [0, DELAY_NOISE) and "
+        "randomly add it to or subtract it from the build"
+        " delay.  This randomises the build delay.  The "
+        "default is 0.",
+    )
 
     # Create /tmp/exitmap_tor_datadir-$USER to allow many users to run
     # exitmap in parallel.
 
     tor_directory = "/tmp/exitmap_tor_datadir-" + pwd.getpwuid(os.getuid())[0]
 
-    parser.add_argument("-t", "--tor-dir", type=str,
-                        default=tor_directory,
-                        help="Tor's data directory.  If set, the network "
-                             "consensus can be re-used in between scans which "
-                             "speeds up bootstrapping.  The default is %s." %
-                             tor_directory)
+    parser.add_argument(
+        "-t",
+        "--tor-dir",
+        type=str,
+        default=tor_directory,
+        help="Tor's data directory.  If set, the network "
+        "consensus can be re-used in between scans which "
+        "speeds up bootstrapping.  The default is %s." % tor_directory,
+    )
 
-    parser.add_argument("-a", "--analysis-dir", type=str,
-                        default=None,
-                        help="The directory where analysis results are "
-                             "written to.  If the directory is used depends "
-                             "on the module.  The default is /tmp.")
+    parser.add_argument(
+        "-a",
+        "--analysis-dir",
+        type=str,
+        default=None,
+        help="The directory where analysis results are "
+        "written to.  If the directory is used depends "
+        "on the module.  The default is /tmp.",
+    )
 
-    parser.add_argument("-v", "--verbosity", type=str, default="info",
-                        help="Minimum verbosity level for logging.  Available "
-                             "in ascending order: debug, info, warning, "
-                             "error, critical).  The default is info.")
+    parser.add_argument(
+        "-v",
+        "--verbosity",
+        type=str,
+        default="info",
+        help="Minimum verbosity level for logging.  Available "
+        "in ascending order: debug, info, warning, "
+        "error, critical).  The default is info.",
+    )
 
-    parser.add_argument("-i", "--first-hop", type=str, default=None,
-                        help="The 20-byte fingerprint of the Tor relay which "
-                             "is used as first hop.  This relay should be "
-                             "under your control.")
+    parser.add_argument(
+        "-i",
+        "--first-hop",
+        type=str,
+        default=None,
+        help="The 20-byte fingerprint of the Tor relay which "
+        "is used as first hop.  This relay should be "
+        "under your control.",
+    )
 
-    parser.add_argument("-o", "--logfile", type=str, default=None,
-                        help="Filename to which log output should be written "
-                             "to.")
+    parser.add_argument(
+        "-o",
+        "--logfile",
+        type=str,
+        default=None,
+        help="Filename to which log output should be written " "to.",
+    )
 
     exits = parser.add_mutually_exclusive_group()
 
-    exits.add_argument("-b", "--bad-exits", action="store_true",
-                       help="Only scan exit relays that have the BadExit "
-                            "flag.  By default, only good exits are scanned.")
+    exits.add_argument(
+        "-b",
+        "--bad-exits",
+        action="store_true",
+        help="Only scan exit relays that have the BadExit "
+        "flag.  By default, only good exits are scanned.",
+    )
 
-    exits.add_argument("-l", "--all-exits", action="store_true",
-                       help="Scan all exits, including those that have the "
-                            "BadExit flag.  By default, only good exits are "
-                            "scanned.")
+    exits.add_argument(
+        "-l",
+        "--all-exits",
+        action="store_true",
+        help="Scan all exits, including those that have the "
+        "BadExit flag.  By default, only good exits are "
+        "scanned.",
+    )
 
-    parser.add_argument("-V", "--version", action="version",
-                        version="%(prog)s 2020.11.23")
+    parser.add_argument(
+        "-V", "--version", action="version", version="%(prog)s 2020.11.23"
+    )
 
-    parser.add_argument("module", nargs='+',
-                        help="Run the given module (available: %s)." %
-                        ", ".join(get_modules()))
+    parser.add_argument(
+        "module",
+        nargs="+",
+        help="Run the given module (available: %s)." % ", ".join(get_modules()),
+    )
 
     parser.set_defaults(**defaults)
 
@@ -228,7 +291,6 @@ def main():
     The scanner's entry point.
     """
 
-    stats = Statistics()
     args = parse_cmd_args()
 
     # Create and set the given directories.
@@ -238,9 +300,11 @@ def main():
 
     logging.getLogger("stem").setLevel(logging.__dict__[args.verbosity.upper()])
     log_format = "%(asctime)s %(name)s [%(levelname)s] %(message)s"
-    logging.basicConfig(format=log_format,
-                        level=logging.__dict__[args.verbosity.upper()],
-                        filename=args.logfile)
+    logging.basicConfig(
+        format=log_format,
+        level=logging.__dict__[args.verbosity.upper()],
+        filename=args.logfile,
+    )
 
     log.debug("Command line arguments: %s" % str(args))
 
@@ -264,20 +328,22 @@ def main():
     controller.set_conf("FetchServerDescriptors", "0")
 
     cached_consensus_path = os.path.join(args.tor_dir, "cached-consensus")
-    if args.first_hop and (not util.relay_in_consensus(args.first_hop,
-                                                       cached_consensus_path)):
-        log.critical("Given first hop \"%s\" not found in consensus.  Is it"
-                     " offline?" % args.first_hop)
+    if args.first_hop and (
+        not util.relay_in_consensus(args.first_hop, cached_consensus_path)
+    ):
+        log.critical(
+            'Given first hop "%s" not found in consensus.  Is it'
+            " offline?" % args.first_hop
+        )
         return 1
 
     for module_name in args.module:
-
         if args.analysis_dir is not None:
             datestr = time.strftime("%Y-%m-%d_%H:%M:%S%z") + "_" + module_name
             util.analysis_dir = os.path.join(args.analysis_dir, datestr)
 
         try:
-            run_module(module_name, args, controller, socks_port, stats)
+            run_module(module_name, args, controller, socks_port)
         except error.ExitSelectionError as err:
             log.error("Failed to run because : %s" % err)
     return 0
@@ -291,10 +357,10 @@ def lookup_destinations(module):
     log.debug("Selecting destinations depending on the module.")
     destinations = set()
     addrs = {}
-    if hasattr(module, 'destinations'):
+    if hasattr(module, "destinations"):
         raw_destinations = module.destinations
         if raw_destinations is not None:
-            for (host, port) in raw_destinations:
+            for host, port in raw_destinations:
                 if host not in addrs:
                     addrs[host] = socket.gethostbyname(host)
                 destinations.add((addrs[host], port))
@@ -332,25 +398,27 @@ def select_exits(args, module):
 
     exit_destinations = relayselector.get_exits(
         args.tor_dir,
-        good_exit       = args.all_exits or (not args.bad_exits),
-        bad_exit        = args.all_exits or args.bad_exits,
-        country_code    = args.country,
-        requested_exits = requested_exits,
-        destinations    = destinations)
+        good_exit=args.all_exits or (not args.bad_exits),
+        bad_exit=args.all_exits or args.bad_exits,
+        country_code=args.country,
+        requested_exits=requested_exits,
+        destinations=destinations,
+    )
 
-    log.debug("Successfully selected exit relays after %s." %
-              str(datetime.datetime.now() - before))
+    log.debug(
+        "Successfully selected exit relays after %s."
+        % str(datetime.datetime.now() - before)
+    )
 
     return exit_destinations
 
 
-def run_module(module_name, args, controller, socks_port, stats):
+def run_module(module_name, args, controller, socks_port):
     """
     Run an exitmap module over all available exit relays.
     """
 
     log.info("Running module '%s'." % module_name)
-    stats.modules_run += 1
 
     try:
         module = __import__("modules.%s" % module_name, fromlist=[module_name])
@@ -359,7 +427,6 @@ def run_module(module_name, args, controller, socks_port, stats):
         return
 
     # Let module perform one-off setup tasks.
-
     if hasattr(module, "setup"):
         log.debug("Calling module's setup() function.")
         module.setup()
@@ -368,8 +435,8 @@ def run_module(module_name, args, controller, socks_port, stats):
     if hasattr(module, "targets"):
         destinations_target_list = module.targets
 
-    idx = 0
     for destinations, target in destinations_target_list:
+        stats = Statistics()
         if destinations is not None:
             log.info(f"Scanning {target}")
             module.destinations = destinations
@@ -379,28 +446,38 @@ def run_module(module_name, args, controller, socks_port, stats):
         exit_relays = list(exit_destinations.keys())
         random.shuffle(exit_relays)
 
-        log.debug("Running actually the module.")
+        log.debug(f"Running actually the module on {target}.")
         count = len(exit_relays)
         stats.total_circuits += count
 
         if count < 1:
-            raise error.ExitSelectionError("Exit selection yielded %d exits "
-                                           "but need at least one." % count)
+            raise error.ExitSelectionError(
+                "Exit selection yielded %d exits " "but need at least one." % count
+            )
 
-        handler = EventHandler(controller, module, socks_port, stats,
-                               exit_destinations=exit_destinations, target=target)
+        handler = EventHandler(
+            controller,
+            module,
+            socks_port,
+            stats,
+            exit_destinations=exit_destinations,
+            target=target,
+        )
 
-        controller.add_event_listener(handler.new_event,
-                                      EventType.CIRC, EventType.STREAM)
+        controller.add_event_listener(
+            handler.new_event, EventType.CIRC, EventType.STREAM
+        )
 
-        duration = count * args.build_delay * (len(destinations_target_list) - idx)
-        log.info("Scan is estimated to take around %s." %
-                 datetime.timedelta(seconds=duration))
+        duration = count * args.build_delay
+        log.info(
+            "Scan is estimated to take around %s."
+            % datetime.timedelta(seconds=duration)
+        )
 
         log.info("Beginning to trigger %d circuit creation(s)." % count)
 
         iter_exit_relays(exit_relays, controller, stats, args)
-        idx += 1
+        handler.wait_on_finish()
 
 
 def sleep(delay, delay_noise):
@@ -440,7 +517,6 @@ def iter_exit_relays(exit_relays, controller, stats, args):
     # Start building a circuit for every exit relay we got.
 
     for i, exit_relay in enumerate(exit_relays):
-
         # Determine the hops in our next circuit.
 
         if args.first_hop:
@@ -463,11 +539,15 @@ def iter_exit_relays(exit_relays, controller, stats, args):
             controller.new_circuit(hops)
         except stem.ControllerError as err:
             stats.failed_circuits += 1
-            log.debug("Circuit with exit relay \"%s\" could not be "
-                      "created: %s" % (exit_relay, err))
+            log.debug(
+                'Circuit with exit relay "%s" could not be '
+                "created: %s" % (exit_relay, err)
+            )
 
         if i != (count - 1):
             sleep(args.build_delay, args.delay_noise)
 
-    log.info("Done triggering circuit creations after %s." %
-             str(datetime.datetime.now() - before))
+    log.info(
+        "Done triggering circuit creations after %s."
+        % str(datetime.datetime.now() - before)
+    )
